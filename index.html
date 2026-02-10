@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-ChemLab Pro: Виртуалды зертхана</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --flask-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 { color: var(--primary); margin-bottom: 5px; }
+
+        .lab-container {
+            display: flex;
+            gap: 30px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .shelf {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            flex: 1;
+        }
+
+        .reagent {
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: 0.2s;
+        }
+
+        .reagent:hover { background: var(--accent); transform: translateY(-2px); }
+
+        .experiment-area {
+            flex: 1;
+            text-align: center;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .flask {
+            width: 140px;
+            height: 180px;
+            border: 4px solid #444;
+            border-bottom-left-radius: 50% 30%;
+            border-bottom-right-radius: 50% 30%;
+            position: relative;
+            overflow: hidden;
+            background: var(--flask-bg);
+            margin: 0 auto 15px;
+            z-index: 1;
+        }
+
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            background: #ddd;
+            transition: height 0.8s, background-color 0.8s;
+            z-index: 2;
+        }
+
+        .precipitate-layer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            transition: 1.5s;
+            z-index: 3;
+            opacity: 0.8;
+        }
+
+        .bubbles {
+            display: none;
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            font-size: 20px;
+            z-index: 4;
+            animation: bubbleUp 1s infinite;
+        }
+
+        @keyframes bubbleUp {
+            0% { transform: translateY(0); opacity: 0.5; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 5px solid var(--accent);
+            background: #fff;
+            width: 100%;
+            max-width: 950px;
+            min-height: 60px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        #reset {
+            padding: 10px 25px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🧪 AI-ChemLab Pro</h1>
+    <p>Реактивтерді таңдап, химиялық процестерді зерттеңіз:</p>
+
+    <div class="lab-container">
+        <div class="shelf">
+            <button class="reagent" onclick="addReagent('Zn', '#bdc3c7')">Zn (Цинк)</button>
+            <button class="reagent" onclick="addReagent('Fe', '#7f8c8d')">Fe (Темір)</button>
+            <button class="reagent" onclick="addReagent('K', '#95a5a6')">K (Калий)</button>
+            <button class="reagent" onclick="addReagent('Mg', '#ecf0f1')">Mg (Магний)</button>
+            <button class="reagent" onclick="addReagent('Cu', '#d35400')">Cu (Мыс)</button>
+            <button class="reagent" onclick="addReagent('HCl', '#e74c3c')">HCl (Тұз қ.)</button>
+            <button class="reagent" onclick="addReagent('CH3COOH', '#ff7675')">Сірке қ.</button>
+            <button class="reagent" onclick="addReagent('CuO', '#2d3436')">CuO (Оксид)</button>
+            <button class="reagent" onclick="addReagent('CaO', '#dfe6e9')">CaO (Әк)</button>
+            <button class="reagent" onclick="addReagent('NaOH', '#0984e3')">NaOH (Сілті)</button>
+            <button class="reagent" onclick="addReagent('KOH', '#74b9ff')">KOH (Сілті)</button>
+            <button class="reagent" onclick="addReagent('CuSO4', '#00cec9')">CuSO4</button>
+            <button class="reagent" onclick="addReagent('AgNO3', '#636e72')">AgNO3</button>
+            <button class="reagent" onclick="addReagent('FeCl3', '#b27b00')">FeCl3</button>
+            <button class="reagent" onclick="addReagent('NaCl', '#fab1a0')">NaCl</button>
+            <button class="reagent" onclick="addReagent('CaCO3', '#ffffff')">CaCO3</button>
+            <button class="reagent" onclick="addReagent('H2O', '#81ecec')">H2O (Су)</button>
+            <button class="reagent" onclick="addReagent('H2O2', '#ffffff')">H2O2</button>
+            <button class="reagent" onclick="addReagent('EtOH', '#a29bfe')">Этанол</button>
+        </div>
+
+        <div class="experiment-area">
+            <div class="flask">
+                <div id="liquid" class="liquid"></div>
+                <div id="precipitate" class="precipitate-layer"></div>
+                <div id="bubbles" class="bubbles">🫧🫧🫧</div>
+            </div>
+            <button id="reset" onclick="resetLab()">Тазарту</button>
+        </div>
+    </div>
+
+    <div id="result" class="result-panel">
+        <i>Зертхана дайын. Бірінші реагентті құйыңыз...</i>
+    </div>
+
+    <script>
+        let selected = [];
+        const liquid = document.getElementById('liquid');
+        const precipitate = document.getElementById('precipitate');
+        const resultDiv = document.getElementById('result');
+        const bubbles = document.getElementById('bubbles');
+
+        const reactions = {
+            'HCl+NaOH': { text: "Бейтараптану: HCl + NaOH → NaCl + H₂O. Ерітінді жылынады.", color: "#f1f2f6", gas: false },
+            'AgNO3+NaCl': { text: "Тұнба: AgNO₃ + NaCl → AgCl↓ + NaNO₃. Ақ ірімшік тәрізді тұнба.", color: "#dfe6e9", precipitateColor: "#ffffff" },
+            'CaCO3+HCl': { text: "Газ бөліну: CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑. Көмірқышқыл газы шығады.", color: "#f1f2f6", gas: true },
+            'H2O2': { text: "Айырылу: 2H₂O₂ → 2H₂O + O₂↑. Оттегі газы қарқынды бөлінеді.", color: "#ffffff", gas: true, single: true },
+            'HCl+Zn': { text: "Металл+Қышқыл: Zn + 2HCl → ZnCl₂ + H₂↑. Сутегі газы бөлінеді.", color: "#dfe6e9", gas: true },
+            'CuO+HCl': { text: "Оксид+Қышқыл: CuO + 2HCl → CuCl₂ + H₂O. Қара оксид еріп, жасыл ерітінді түзілді.", color: "#55efc4", gas: false },
+            'CH3COOH+KOH': { text: "Бейтараптану: KOH + CH₃COOH → CH₃COOK + H₂O. Калий ацетаты түзілді.", color: "#f1f2f6", gas: false },
+            'FeCl3+NaOH': { text: "Тұнба: FeCl₃ + 3NaOH → Fe(OH)₃↓ + 3NaCl. Қоңыр-қызыл тұнба.", color: "#fab1a0", precipitateColor: "#d35400" },
+            'H2O+K': { text: "Белсенді металл: 2K + 2H₂O → 2KOH + H₂↑. Калий жарқырап жанады!", color: "#a29bfe", gas: true },
+            'CH3COOH+EtOH': { text: "Этерификация: C₂H₅OH + CH₃COOH → CH₃COOC₂H₅ + H₂O. Жағымды эфир иісі.", color: "#ffeaa7", gas: false },
+            'CaCO3': { text: "Термиялық айырылу: CaCO₃ → CaO + CO₂↑. Көмірқышқыл газы бөлінеді.", color: "#ffffff", gas: true, single: true },
+            'CuSO4+Fe': { text: "Орынбасу: Fe + CuSO₄ → FeSO₄ + Cu. Темір бетінде қызыл мыс шөгеді.", color: "#81ecec", precipitateColor: "#e17055" }
+        };
+
+        function addReagent(name, color) {
+            if (selected.length < 2) {
+                selected.push(name);
+                let currentHeight = parseInt(liquid.style.height) || 0;
+                liquid.style.height = (currentHeight + 40) + "%";
+                liquid.style.backgroundColor = color;
+
+                // Бір затпен жүретін реакцияларды тексеру (H2O2 немесе CaCO3 ыдырауы сияқты)
+                if (reactions[name] && reactions[name].single) {
+                    processReaction(reactions[name]);
+                } else if (selected.length === 2) {
+                    checkReaction();
+                }
+            }
+        }
+
+        function checkReaction() {
+            const key1 = selected[0] + "+" + selected[1];
+            const key2 = selected[1] + "+" + selected[0];
+            const reaction = reactions[key1] || reactions[key2];
+
+            if (reaction) {
+                processReaction(reaction);
+            } else {
+                resultDiv.innerHTML = "<strong>Нәтиже:</strong> Көрінетін реакция байқалмады.";
+            }
+        }
+
+        function processReaction(res) {
+            setTimeout(() => {
+                liquid.style.backgroundColor = res.color;
+                resultDiv.innerHTML = `<strong>Нәтиже:</strong> ${res.text}`;
+                if (res.gas) bubbles.style.display = 'block';
+                if (res.precipitateColor) {
+                    precipitate.style.height = "25%";
+                    precipitate.style.backgroundColor = res.precipitateColor;
+                }
+            }, 800);
+        }
+
+        function resetLab() {
+            selected = [];
+            liquid.style.height = "0%";
+            precipitate.style.height = "0%";
+            bubbles.style.display = 'none';
+            resultDiv.innerHTML = "<i>Зертхана тазартылды. Реагентті таңдаңыз...</i>";
+        }
+    </script>
+</body>
+</html>
